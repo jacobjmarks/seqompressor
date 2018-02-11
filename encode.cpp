@@ -1,9 +1,10 @@
 #include <iostream>
 #include <fstream>
+#include <deque>
 
 using namespace std;
 
-char encode(string twomer) {
+char encode(deque<char> twomer) {
     unsigned char encoded = 0;
     for (uint i = 0; i < 2; i++) {
         switch (twomer[i]) {
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
     if (!file.is_open()) throw runtime_error("Cannot open file.");
 
     char ch;
-    string twomer;
+    deque<char> twomer;
     while ((ch = file.get()) != EOF) {
         if (ch == '\n' || ch == '\r') {
             // Skip
@@ -45,14 +46,15 @@ int main(int argc, char* argv[]) {
              if ((int)file.tellg() != 1) cout << endl;
              file.ignore(UINT32_MAX, '\n');
         } else {
-            twomer.push_back(ch);
+            twomer.push_front(ch);
 
-            if (twomer.length() == 2) {
+            if (twomer.size() == 2) {
                 cout << encode(twomer);
                 twomer.clear();
             }
         }
     }
+    cout << endl;
     
     file.close();
     return 0;
