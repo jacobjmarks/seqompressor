@@ -6,13 +6,12 @@ using namespace std;
 
 queue<char> decode(char encoded) {
     queue<char> twomer;
-    for (uint i = 0; i < 2; i++) {
+    for (int i = 1; i >= 0; i--) {
         switch (encoded >> (4 * i) & 0b00001111) {
             case 0x8: twomer.push('A'); break;
             case 0x4: twomer.push('C'); break;
             case 0x2: twomer.push('G'); break;
             case 0x1: twomer.push('T'); break;
-            case 0x0: twomer.push('U'); break;
             case 0x9: twomer.push('W'); break;
             case 0x6: twomer.push('S'); break;
             case 0xC: twomer.push('M'); break;
@@ -24,7 +23,7 @@ queue<char> decode(char encoded) {
             case 0xD: twomer.push('H'); break;
             case 0xE: twomer.push('V'); break;
             case 0xF: twomer.push('N'); break;
-            default: throw runtime_error("Unhandled encoding.");
+            default: twomer.push(0);
         }
     }
     return twomer;
@@ -42,7 +41,7 @@ int main(int argc, char* argv[]) {
             cout << endl;
         } else {
             queue<char> twomer = decode(ch);
-            cout << twomer.back() << twomer.front();
+            cout << twomer.front() << twomer.back();
         }
     }
 
