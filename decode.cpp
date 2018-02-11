@@ -7,7 +7,7 @@ using namespace std;
 queue<char> decode(char encoded) {
     queue<char> twomer;
     for (int i = 1; i >= 0; i--) {
-        switch (encoded >> (4 * i) & 0b00001111) {
+        switch (encoded >> (4 * i) & 0xF) {
             case 0x8: twomer.push('A'); break;
             case 0x4: twomer.push('C'); break;
             case 0x2: twomer.push('G'); break;
@@ -35,14 +35,13 @@ int main(int argc, char* argv[]) {
     file.open(argv[1]);
     if (!file.is_open()) throw runtime_error("Cannot open file.");
 
-    char ch;
-    while ((ch = file.get()) != EOF) {
-        if (ch == '\n') {
-            cout << endl;
-        } else {
-            queue<char> twomer = decode(ch);
+    string line;
+    while (getline(file, line)) {
+        for (uint i = 0; i < line.length(); i++) {
+            queue<char> twomer = decode(line[i]);
             cout << twomer.front() << twomer.back();
         }
+        cout << endl;
     }
 
     file.close();
