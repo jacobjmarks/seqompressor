@@ -1,13 +1,13 @@
 #include <iostream>
 #include <fstream>
-#include <deque>
+#include <queue>
 
 using namespace std;
 
-char encode(deque<char> twomer) {
+char encode(queue<char> * twomer) {
     unsigned char encoded = 0;
-    for (uint i = 0; i < 2; i++) {
-        switch (twomer[i]) {
+    for (int i = 1; i >= 0; i--) {
+        switch ((*twomer).front()) {
             case 'A': encoded |= 0x8 << 4 * i; break;
             case 'C': encoded |= 0x4 << 4 * i; break;
             case 'G': encoded |= 0x2 << 4 * i; break;
@@ -24,8 +24,9 @@ char encode(deque<char> twomer) {
             case 'H': encoded |= 0xD << 4 * i; break;
             case 'V': encoded |= 0xE << 4 * i; break;
             case 'N': encoded |= 0xF << 4 * i; break;
-            default: throw runtime_error((string)"Unhandled nucleotide: " + twomer[i]);
+            default: throw runtime_error((string)"Unhandled nucleotide: " + (*twomer).front());
         }
+        (*twomer).pop();
     }
 
     return encoded;
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
     if (!file.is_open()) throw runtime_error("Cannot open file.");
 
     char ch;
-    deque<char> twomer;
+    queue<char> twomer;
     while ((ch = file.get()) != EOF) {
         if (ch == '\n' || ch == '\r') {
             // Skip
@@ -46,11 +47,10 @@ int main(int argc, char* argv[]) {
              if ((int)file.tellg() != 1) cout << endl;
              file.ignore(UINT32_MAX, '\n');
         } else {
-            twomer.push_front(ch);
+            twomer.push(ch);
 
             if (twomer.size() == 2) {
-                cout << encode(twomer);
-                twomer.clear();
+                cout << encode(&twomer);
             }
         }
     }
