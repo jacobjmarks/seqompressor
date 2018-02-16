@@ -37,19 +37,32 @@ int main(int argc, char* argv[]) {
     file.open(argv[1]);
     if (!file.is_open()) throw runtime_error("Cannot open file.");
 
+    const bool retain_headers = true;
+
     char ch;
     queue<char> twomer;
     while ((ch = file.get()) != EOF) {
         if (ch == '\r') {
             // Skip
         } else if (ch == '\n') {
-            if (file.peek() == '>' && twomer.size() == 1) {
-                twomer.push(0);
-                cout << encode(&twomer);
-            }
+            if (file.peek() == '>') {
+                if (twomer.size() == 1) {
+                    // Odd length sequence
+                    twomer.push(0);
+                    cout << encode(&twomer);
+                }
+                if (retain_headers) cout << endl;
+            } 
         } else if (ch == '>') {
-            if ((int)file.tellg() != 1) cout << endl;
-            file.ignore(UINT32_MAX, '\n');
+            if (retain_headers) {
+                do {
+                    cout << ch;
+                } while((ch = file.get()) != '\n');
+                cout << endl;
+            } else {
+                if ((int)file.tellg() != 1) cout << endl;
+                file.ignore(UINT32_MAX, '\n');
+            }
         } else {
             twomer.push(ch);
             if (twomer.size() == 2) {
