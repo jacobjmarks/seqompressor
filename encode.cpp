@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <queue>
+#include <string.h>
 
 using namespace std;
 
@@ -32,12 +33,39 @@ char encode(queue<char> * twomer) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) throw invalid_argument("Please specify file to encode.");
-    ifstream file;
-    file.open(argv[1]);
-    if (!file.is_open()) throw runtime_error("Cannot open file.");
+    // ARGUMENT PARSING ---------------------------------------
+    auto usage = [&argv](string message){
+        if (message != "") cerr << message << endl;
+        fprintf(stderr, "Usage: %s [-H] file\n", argv[0]);
+        fprintf(stderr, "  -H : Retain sequence headers.\n");
+        return 1;
+    };
 
-    const bool retain_headers = true;
+    if (argc < 2) return usage("");
+    if (argc > 3) return usage("Too many arguments!");
+
+    static bool retain_headers = false;
+    static string filename;
+
+    for (int i = 1; i < argc; i++) {
+        auto arg = [&argv, i](string arg){
+            return !strcmp(argv[i], arg.c_str());
+        };
+
+        if (arg("-H")) {
+            retain_headers = true;
+            continue;
+        }
+        
+        filename = argv[i];
+    }
+    if (filename.empty()) return usage("Please specify file!");
+    // --------------------------------------------------------
+
+    ifstream file;
+    file.open(filename);
+    if (!file.is_open()) throw runtime_error("Cannot open file: " + filename);
+
 
     char ch;
     queue<char> twomer;
